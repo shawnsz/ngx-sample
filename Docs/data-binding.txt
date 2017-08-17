@@ -7,7 +7,11 @@ Event bindings: <button (click)="onSave()">Save</button>
 Two-way binding: <input [(ngModel)]="hero.name" placeholder="name">
 
 
-Example 1: Google Search
+Examle 1: 
+<input type=”text” [value]=”fName” (click)=”showvalue($event)” />
+console.log(“event.target.value”);
+
+Example 2: Google Search
 
 <input name="urhdinput"  #urhdinput (keydown)="processEnterKey($event, urhdinput.value)" />
 <button (click)="searchAtcion(urhdinput.value)">OK</button>
