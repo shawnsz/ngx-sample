@@ -1,0 +1,25 @@
+.top-container {
+  width: 100%;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.board-panel {
+  width: 100%;
+  display: flex;
+}
+
+.board-panel>div {
+  flex-direction: column;
+}
+
+.board-cell {
+  width: 88px;
+  height: 88px;
+  margin: 4px;
+  font-size: 64px;
+  line-height: 1.4;
+  text-align: center;
+  background-color: #b9e0df;
+}

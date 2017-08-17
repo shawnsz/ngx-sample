@@ -1,0 +1,11 @@
+Create app-routing.module.ts
+
+And then put to app.module.ts
+
+import { AppRoutingModule } from './app-routing.module';
+
+imports: [
+  BrowserModule,
+  AppRoutingModule,
+  ...
+],

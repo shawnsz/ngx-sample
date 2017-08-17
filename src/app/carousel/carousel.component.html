@@ -1,0 +1,41 @@
+<div class="carousel slide">
+  <ol class="carousel-indicators">
+    <li  *ngFor="let item of Slides;let idx = index;" [ngClass]="{'active':item.active}" (click)="slideTo(idx)"></li>
+  </ol>
+  <div class="carousel-inner" role="listbox" (mouseover)="onMouseOver()" (mouseout)="onMouseOut()">
+    <div *ngFor="let item of Slides;" class="carousel-item" [@slideMoveforward]="item.ForwardState" [ngClass]="{'active':item.active}" (@slideMoveforward.done)="animationDone($event)">
+      <div class="ur-parallax {{item.imgClass}}"><div class="ratio"></div></div>
+      <div class="carousel-caption">
+        <h1 class="cap-item" *ngIf="item.title1">{{item.title1}}</h1>
+        <h1 class="cap-item" *ngIf="item.title2">{{item.title2}}</h1>
+        <h2 class="cap-item" *ngIf="item.textInfo1">{{item.textInfo1}}</h2>
+        <h2 class="cap-item" *ngIf="item.textInfo2">{{item.textInfo2}}</h2>
+      </div>
+    </div>
+  </div>
+  <a class="carousel-control-prev" role="button" (click)="slidePrev()">
+    <div class="carousel-control-box" aria-hidden="true">
+      <div class="carousel-control-prev-icon nav-icon">
+        <svg fill="#ffffff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            <path d="M0 0h24v24H0z" fill="none"/>
+        </svg>
+      </div>
+    </div>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" role="button" (click)="slideNext()">
+    <div class="carousel-control-box" aria-hidden="true">
+      <div class="carousel-control-prev-icon nav-icon">
+        <svg fill="#ffffff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+            <path d="M0 0h24v24H0z" fill="none"/>
+        </svg>
+      </div>
+    </div>
+    <span class="sr-only">Next</span>
+  </a>
+  <div class="invisible-cont" *ngFor="let item of Slides;let idx = index;" >
+    <div class="{{item.imgClass}}"></div>
+  </div>
+</div>

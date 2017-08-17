@@ -1,0 +1,111 @@
+
+
+
+
+
+# post.service.ts
+
+import { Injectable } from '@angular/core';
+import { Http, Headers, RequestOptions } from '@angular/http';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+
+@Injectable()
+export class PostService {
+  private API_ENDPOINT = '//52.11.245.71/urapi/mail';
+  constructor(private _http: Http) {}
+
+  saveContact(contact: any) {
+    let headers = new Headers({ 'Content-Type': 'application/json' }); // create new Headers object with header Content-Type is application/json.
+    // headers.append('Authorization', 'Bearer ' + your_token); //JWT token
+    let options = new RequestOptions({ headers: headers });
+    return this._http.post(this.API_ENDPOINT, contact, options)
+      .map(res => res.json());
+  }
+}
+
+---------------
+contact-us.component.ts
+
+import { Component, Input, OnInit, OnDestroy, Inject} from '@angular/core';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+
+// import { trigger, state, style, transition, animate } from '@angular/animations';
+
+import { PostService } from '../post.service';
+
+@Component({
+  selector: 'urtk-contact-us',
+  templateUrl: './contact-us.component.html',
+  styleUrls: ['../share/common.css','./contact-us.component.scss']
+})
+export class ContactUsComponent implements OnInit, OnDestroy {
+
+  public frmContact: FormGroup;
+
+  private subsRef: any;
+
+  constructor(private router: Router, private fb: FormBuilder, private postService: PostService) { }
+
+  ngOnInit() {
+    this.frmContact = this.fb.group({
+      fname: ['', Validators.required],
+      lname: ['', Validators.required],
+      emailaddr: ['', [<any>Validators.required, <any>Validators.email]],
+      phonenum: [''],
+      inquirytxt: ['']
+    });
+  }
+
+  onSubmit() {
+    let formValue = this.frmContact.value;
+
+    this.subsRef = this.postService.saveContact(formValue)
+      .subscribe(data => {
+        if (data) {
+          window.alert(data.info);
+          // data.detail
+        } else {
+          window.alert('Error');
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    // clean subscription when component destroy
+    if (this.subsRef) {
+      this.subsRef.unsubscribe();
+    }
+  }
+}
+
+
+----
+contact-us-component.html
+
+<section class="ur-contact-section">
+  <div class="form-result" [ngClass]="DispResult">
+    <div class="result-info">
+      {{ResMsg}}
+    </div>
+  </div>
+  <div class="form-style">
+    <form class="ur-contact-form" [formGroup]="frmContact" (ngSubmit)="onSubmit()" novalidate>
+      <div class="input-container">
+        <input type="text" placeholder="First name*" formControlName="fname">
+        <input type="text" placeholder="Last Name*" formControlName="lname">
+        <input type="email" placeholder="Email*" formControlName="emailaddr">
+        <input type="tel" placeholder="Phone#" formControlName="phonenum">
+      </div>
+
+      <div class="question-container">
+        <textarea placeholder="Inquiry" value="" formControlName="inquirytxt"></textarea>
+      </div>
+
+      <div class="btn-submit-cont">
+        <button [disabled]="(frmContact.invalid)">Submit</button>
+      </div>
+    </form>
+  </div>
+</section>

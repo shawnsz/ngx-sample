@@ -1,0 +1,141 @@
+
+
+Data binding: interpolation, Property binding binding, two-way binding, and event binding.
+Interpolation: <p>Welcome back {{currentUser.name}}!</p>
+Property binding: <img [src]="userImgUrl">
+Event bindings: <button (click)="onSave()">Save</button>
+Two-way binding: <input [(ngModel)]="hero.name" placeholder="name">
+
+
+Example 1: Google Search
+
+<input name="urhdinput"  #urhdinput (keydown)="processEnterKey($event, urhdinput.value)" />
+<button (click)="searchAtcion(urhdinput.value)">OK</button>
+
+import { Component, ViewChild, Input, OnInit, Inject } from '@angular/core';
+import { SiteSearchService } from '../site-search.service';
+
+private subObs;
+
+constructor(private pRouter: Router, private pSiteSearchService: SiteSearchService) { }
+
+  searchAtcion(urhdinput: string) {
+  if (urhdinput) {
+    this.subObs = this.pSiteSearchService.searchAction(urhdinput).subscribe(data => {
+      if (data) {
+        this.pRouter.navigateByUrl('/search-results.html');
+      } else {
+        window.alert('Search Error');
+      }
+    });
+  }
+}
+
+processEnterKey(eveEle, urhdinput) {
+  if (eveEle.keyCode === 13) {
+    this.searchAtcion(urhdinput);
+  }
+}
+
+ngOnDestroy() {
+  // clean subscription when component destroy
+  if (this.subObs) {
+    this.subObs.unsubscribe();
+  }
+}
+
+search-results component
+<div class="search-item" *ngFor="let cItem of SearchResults.resList">
+  <div>
+    <a href="{{cItem.link}}" target="_blank"><span [innerHTML]="cItem.htmlTitle"></span></a>
+  </div>
+  <div>
+    {{ cItem.link }}
+  </div>
+  <div [innerHTML]="cItem.htmlSnippet">
+  </div>
+</div>
+
+import { Component, OnInit } from '@angular/core';
+import { SiteSearchService } from '../site-search.service';
+
+@Component({
+  selector: 'tic-search-results',
+  templateUrl: './search-results.component.html',
+  styleUrls: ['../share/common.scss', './search-results.component.scss']
+})
+export class SearchResultsComponent implements OnInit {
+  public SearchResults:any;
+
+  constructor(private pSiteSearchService: SiteSearchService) {
+  }
+
+  ngOnInit() {
+    this.pSiteSearchService.getSearchRes().subscribe((value) => {
+          this.SearchResults = value;
+    });
+  }
+
+
+}
+
+-----
+
+site service service
+
+import { Injectable } from '@angular/core';
+import { Http, Headers, RequestOptions } from '@angular/http';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+import {Observable} from 'rxjs/Observable';
+import {Subject} from 'rxjs/Subject';
+import {BehaviorSubject} from 'rxjs/Rx';
+import {CseItem, CseResults} from './cse-item';
+
+@Injectable()
+export class SiteSearchService {
+  private apiKey: string;
+  private cseCx: string;
+  private cseEndpoint: string;
+  private searchUrl: string;
+
+  private sResults: BehaviorSubject<CseResults>;
+
+  constructor(private pHttp: Http) {
+    let tmpsRes = new CseResults();
+    tmpsRes.searchStatus = 0;
+    this.sResults = new BehaviorSubject<CseResults>(tmpsRes);
+
+    this.cseEndpoint = 'https://www.googleapis.com/customsearch/v1';
+    this.apiKey = 'AIzaSyCDjE-s6vTa-DNAFpWKeWxCuwn1zHcPcnU';
+    this.cseCx = '012843411704009749500:p9he5znsmdm';
+    this.searchUrl = this.cseEndpoint + '?key=' + this.apiKey + '&cx=' + this.cseCx + '&q=';
+  }
+
+  get SearchResults() {
+    let tmpObj = this.sResults.getValue();
+    console.log('get:', tmpObj);
+    return tmpObj;
+  }
+
+  getSearchRes() {
+    return this.sResults.asObservable();
+  }
+
+  searchAction(searchTxt: string) {
+    let headers = new Headers({ 'Content-Type': 'application/json' }); // create new Headers object with header Content-Type is application/json.
+    // headers.append('Authorization', 'Bearer ' + your_token); //JWT token
+    let options = new RequestOptions({ headers: headers });
+
+    // .publishLast().refCount()
+
+    let tmpObj = this.pHttp.get(this.searchUrl + searchTxt).map(res => res.json()).subscribe(result => {
+      let tmpRes = new CseResults().deserialize(result);
+      this.sResults.next(tmpRes);
+    });
+
+    return this.sResults.asObservable();
+    // items  title htmlTitle link displayLink htmlSnippet htmlSnippet formattedUrl htmlFormattedUrl
+  }
+
+}

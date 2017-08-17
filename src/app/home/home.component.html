@@ -1,0 +1,14 @@
+<div class="top-container">
+  <h1>Just a test</h1>
+  <div>
+
+  </div>
+</div>
+
+<div class="top-container">
+  <div class="board-panel">
+    <div *ngFor="let gbRow of gameBoard; let i = index">
+      <div class="board-cell" *ngFor="let gbCell of gbRow; let j = index" (click)="actGeme(i,j)">{{gbCell | gameIcon}}</div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,6 @@
+
+Observables: Observables are the main data structure we use to implement Reactive Programming.
+RxJS is functional
+Falcor often used with an Observables-type data architecture.
+
+Redux uses functional composition where Flux uses callback registration.
